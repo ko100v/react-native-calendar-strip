@@ -149,12 +149,12 @@ class CalendarStrip extends Component {
 
     if (!this.compareDates(prevProps.startingDate, this.props.startingDate)) {
       updateState = true;
-      startingDate = { startingDate: this.setLocale(this.props.startingDate)};
+      startingDate = { startingDate: this.setLocale(this.props.startingDate) };
       days = this.createDays(startingDate.startingDate);
     }
 
     if (updateState) {
-      this.setState({...startingDate, ...days });
+      this.setState({ ...startingDate, ...days });
     }
   }
 
@@ -180,8 +180,7 @@ class CalendarStrip extends Component {
   // JS date, or ISO 8601 strings.
   // Returns true if the datetimes values are the same; false otherwise.
   compareDates = (date1, date2) => {
-    if (date1 && date1.valueOf && date2 && date2.valueOf)
-    {
+    if (date1 && date1.valueOf && date2 && date2.valueOf) {
       return moment(date1).isSame(date2, "day");
     } else {
       return JSON.stringify(date1) === JSON.stringify(date2);
@@ -265,11 +264,11 @@ class CalendarStrip extends Component {
     let startingDate = moment(date);
     startingDate = this.props.useIsoWeekday ? startingDate.startOf("isoweek") : startingDate;
     const days = this.createDays(startingDate);
-    this.setState({startingDate, ...days});
+    this.setState({ startingDate, ...days });
   }
 
   //Handling press on date/selecting date
-  onDateSelected = selectedDate => {
+  onDateSelected = (selectedDate, completeLifecycle = true, autoUpdateWeekView) => {
     let newState;
     if (this.props.scrollable) {
       newState = { selectedDate };
@@ -280,9 +279,16 @@ class CalendarStrip extends Component {
         ...this.createDays(this.state.startingDate, selectedDate),
       };
     }
-    this.setState(newState);
+    this.setState(newState, () => {
+      if (autoUpdateWeekView) {
+        this.updateWeekView(this.state.selectedDate)
+      }
+    });
     const _selectedDate = selectedDate && selectedDate.clone();
-    this.props.onDateSelected && this.props.onDateSelected(_selectedDate);
+
+    if (completeLifecycle) {
+      this.props.onDateSelected && this.props.onDateSelected(_selectedDate);
+    }
   }
 
   // Get the currently selected date (Moment JS object)
@@ -294,9 +300,9 @@ class CalendarStrip extends Component {
   }
 
   // Set the selected date.  To clear the currently selected date, pass in 0.
-  setSelectedDate = date => {
+  setSelectedDate = (date, completeLifecycle, autoUpdateWeekView) => {
     let mDate = moment(date);
-    this.onDateSelected(mDate);
+    this.onDateSelected(mDate, completeLifecycle, autoUpdateWeekView);
   }
 
   // Gather animations from each day. Sequence animations must be started
@@ -365,7 +371,7 @@ class CalendarStrip extends Component {
       marginHorizontal,
       numVisibleDays,
     },
-    () => this.setState( {...this.createDays(this.state.startingDate)} ));
+      () => this.setState({ ...this.createDays(this.state.startingDate) }));
   }
 
   getItemLayout = (data, index) => {
@@ -432,7 +438,7 @@ class CalendarStrip extends Component {
     if (scrollable) {
       numDays = this.numDaysScroll;
       // Center start date in scroller.
-      _startingDate = startingDate.clone().subtract(numDays/2, "days");
+      _startingDate = startingDate.clone().subtract(numDays / 2, "days");
       if (minDate && _startingDate.isBefore(minDate, "day")) {
         _startingDate = moment(minDate);
       }
@@ -453,7 +459,7 @@ class CalendarStrip extends Component {
         if (date.isSame(startingDate, "day")) {
           initialScrollerIndex = i;
         }
-        datesList.push({date});
+        datesList.push({ date });
       }
       else {
         days.push(this.renderDay({
@@ -461,7 +467,7 @@ class CalendarStrip extends Component {
           key: date.format("YYYY-MM-DD"),
           ...this.createDayProps(selectedDate),
         }));
-        datesList.push({date});
+        datesList.push({ date });
       }
     }
 
@@ -493,7 +499,7 @@ class CalendarStrip extends Component {
   }
 
   renderHeader() {
-    return ( this.props.showMonth &&
+    return (this.props.showMonth &&
       <CalendarHeader
         calendarHeaderFormat={this.props.calendarHeaderFormat}
         calendarHeaderContainerStyle={this.props.calendarHeaderContainerStyle}
@@ -515,7 +521,7 @@ class CalendarStrip extends Component {
           ref={scroller => this.scroller = scroller}
           data={this.state.datesList}
           renderDay={this.renderDay}
-          renderDayParams={{...this.createDayProps(this.state.selectedDate)}}
+          renderDayParams={{ ...this.createDayProps(this.state.selectedDate) }}
           maxSimultaneousDays={this.numDaysScroll}
           initialRenderIndex={this.state.initialScrollerIndex}
           minDate={this.props.minDate}
@@ -563,8 +569,8 @@ class CalendarStrip extends Component {
               {this.props.showDate ? (
                 this.renderWeekView(this.state.days)
               ) : (
-                this.renderHeader()
-              )}
+                  this.renderHeader()
+                )}
             </View>
 
             <WeekSelector

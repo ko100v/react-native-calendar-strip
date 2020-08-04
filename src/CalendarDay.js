@@ -136,9 +136,8 @@ class CalendarDay extends Component {
     }
 
     if ((prevProps.datesBlacklist !== this.props.datesBlacklist) ||
-        (prevProps.datesWhitelist !== this.props.datesWhitelist) ||
-        hasDateChanged)
-    {
+      (prevProps.datesWhitelist !== this.props.datesWhitelist) ||
+      hasDateChanged) {
       newState = { ...newState, enabled: this.isDateAllowed(this.props.date, this.props.datesBlacklist, this.props.datesWhitelist) };
       doStateUpdate = true;
     }
@@ -441,9 +440,19 @@ class CalendarDay extends Component {
       borderRadius: containerBorderRadius,
     };
 
+    _dateNameStyle = {
+      ..._dateNameStyle,
+      color: '#ffffff'
+    }
+
+    _dateNumberStyle = {
+      ..._dateNumberStyle,
+      color: '#ffffff'
+    }
+
     let day;
     if (DayComponent) {
-      day = (<DayComponent {...this.props} {...this.state}/>);
+      day = (<DayComponent {...this.props} {...this.state} />);
     }
     else {
       day = (
@@ -477,7 +486,7 @@ class CalendarDay extends Component {
                 >
                   {date.date()}
                 </Text>
-                { this.renderMarking() }
+                {this.renderMarking()}
               </View>
             )}
           </View>
@@ -488,15 +497,15 @@ class CalendarDay extends Component {
     return calendarAnimation && !scrollable ? (
       <Animated.View style={[
         styles.dateRootContainer,
-        {opacity: this.state.animatedValue}
+        { opacity: this.state.animatedValue }
       ]}>
         {day}
       </Animated.View>
     ) : (
-      <View style={styles.dateRootContainer}>
-        {day}
-      </View>
-    );
+        <View style={styles.dateRootContainer}>
+          {day}
+        </View>
+      );
   }
 }
 
